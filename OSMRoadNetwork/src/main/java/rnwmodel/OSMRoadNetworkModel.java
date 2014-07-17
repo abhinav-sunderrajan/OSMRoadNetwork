@@ -85,8 +85,6 @@ public class OSMRoadNetworkModel {
 			road.setOneWay(rs.getBoolean("oneway"));
 			road.setName(rs.getString("roadname"));
 
-			boolean inSingapore = false;
-
 			for (int i = 0; i < split.length; i++) {
 				int nodeId = Integer.parseInt(split[i]);
 				OSMNode node = model.allNodes.get(nodeId);
@@ -97,7 +95,6 @@ public class OSMRoadNetworkModel {
 					if (!road.isOneWay()) {
 						node.getInRoads().add(road);
 					}
-					inSingapore = true;
 				} else if (i == split.length - 1) {
 					model.beginAndEndNodes.add(node);
 					road.setEndNode(node);
@@ -106,15 +103,13 @@ public class OSMRoadNetworkModel {
 						node.getOutRoads().add(road);
 					}
 
-					inSingapore = true;
 				}
 				roadNodes.add(model.allNodes.get(nodeId));
 
 			}
 
 			road.setRoadNodes(roadNodes);
-			if (inSingapore)
-				model.allRoads.add(road);
+			model.allRoads.add(road);
 		}
 
 	}
@@ -138,6 +133,24 @@ public class OSMRoadNetworkModel {
 	 */
 	public Set<OSMNode> getBeginAndEndNodes() {
 		return beginAndEndNodes;
+	}
+
+	/**
+	 * Returns the road from the model which connects the beginNode and endNode
+	 * 
+	 * @param beginNode
+	 * @param endNode
+	 * @return
+	 */
+	public OSMRoad getConnectingRoad(OSMNode beginNode, OSMNode endNode) {
+		OSMRoad link = null;
+		for (OSMRoad road : allRoads) {
+			if (road.getBeginNode().getNodeId() == beginNode.getNodeId()
+					&& road.getEndNode().getNodeId() == endNode.getNodeId()) {
+				link = road;
+			}
+		}
+		return link;
 	}
 
 }

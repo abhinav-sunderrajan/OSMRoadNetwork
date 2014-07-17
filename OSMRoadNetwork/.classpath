@@ -32,5 +32,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/combinatoricslib-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/disruptor-2.10.1.jar"/>
+	<classpathentry kind="lib" path="lib/java_websocket.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

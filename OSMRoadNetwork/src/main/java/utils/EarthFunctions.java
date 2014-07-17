@@ -7,6 +7,12 @@ import rnwmodel.OSMRoad;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineSegment;
 
+/**
+ * Calculating distances between nodes and edges of the road-network.
+ * 
+ * @author abhinav.sunderrajan
+ * 
+ */
 public class EarthFunctions {
 	private static final double EARTH_RADIUS = 6378137; // in meters
 
