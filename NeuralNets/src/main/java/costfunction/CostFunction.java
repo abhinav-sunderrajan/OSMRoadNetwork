@@ -1,8 +1,12 @@
 package costfunction;
 
+import java.text.DecimalFormat;
+
 import org.la4j.Vector;
 
 public interface CostFunction {
+
+	public static final DecimalFormat df = new DecimalFormat("#.####");
 
 	/**
 	 * Returns the error in the Neural Network based on the error between the

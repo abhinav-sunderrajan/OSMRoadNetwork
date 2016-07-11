@@ -17,7 +17,7 @@ public class CrossEntropyCost implements CostFunction {
 			cost += temp;
 		}
 
-		return cost;
+		return Double.parseDouble(df.format(cost));
 	}
 
 	@Override

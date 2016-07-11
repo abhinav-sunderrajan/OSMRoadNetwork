@@ -16,7 +16,7 @@ public class QuadraticCost implements CostFunction {
 			cost += (nnOutput.get(i) - desiredOutput.get(i))
 					* (nnOutput.get(i) - desiredOutput.get(i));
 		}
-		return cost / 2.0;
+		return Double.parseDouble(df.format(cost / 2.0));
 	}
 
 	@Override

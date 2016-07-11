@@ -26,7 +26,7 @@ public class NeuralNetwork {
 	private Random random;
 	private TrainingData td;
 	private CostFunction costFunction;
-	private double lambda = 10.0;
+	private double lambda = 1.0;
 	private static NeuralNetwork network;
 
 	public static enum REGULARIZATION {
@@ -146,14 +146,14 @@ public class NeuralNetwork {
 	}
 
 	/**
-	 * Return the out put of the configured neural network.
+	 * Return the output of the configured neural network.
 	 * 
 	 * @param input
 	 * @return
 	 */
 	public Vector feedForward(Vector input) {
 		for (int i = 0; i < bias.length; i++) {
-			input = CommonUtils.sigmoid(weights[i].multiply(input).add(bias[i]));
+			input = CommonUtils.reLU(weights[i].multiply(input).add(bias[i]));
 		}
 		return input;
 
@@ -236,7 +236,7 @@ public class NeuralNetwork {
 		while (index < numOfLayers) {
 			Vector zl = weights[index].multiply(activation).add(bias[index]);
 			zlList.add(zl);
-			activation = CommonUtils.sigmoid(zl);
+			activation = CommonUtils.reLU(zl);
 			activations.add(activation);
 			index++;
 		}
@@ -249,7 +249,7 @@ public class NeuralNetwork {
 
 		for (int layer = numOfLayers - 2; layer >= 0; layer--) {
 			Vector z = zlList.get(layer);
-			Vector sp = CommonUtils.sigmoidPrime(z);
+			Vector sp = CommonUtils.reLUPrime(z);
 			delta = weights[layer + 1].transpose().multiply(delta).hadamardProduct(sp);
 			costBiasDer.add(0, delta);
 			costWeightDer.add(0, delta.outerProduct(activations.get(layer)));
@@ -287,6 +287,21 @@ public class NeuralNetwork {
 	 */
 	public void setRegularizationParam(double regularizationParam) {
 		this.lambda = regularizationParam;
+	}
+
+	/**
+	 * @return the lambda
+	 */
+	public double getLambda() {
+		return lambda;
+	}
+
+	/**
+	 * @param lambda
+	 *            the lambda to set
+	 */
+	public void setLambda(double lambda) {
+		this.lambda = lambda;
 	}
 
 }
