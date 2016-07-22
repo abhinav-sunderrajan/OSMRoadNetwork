@@ -4,6 +4,7 @@ import org.la4j.Matrix;
 import org.la4j.Vector;
 
 import activations.Activation;
+import activations.Sigmoid;
 
 /**
  * 
@@ -15,6 +16,10 @@ public class Layer {
 	private Matrix weight;
 	private Vector bias;
 	private Activation activation;
+
+	public Layer() {
+		this.activation = new Sigmoid();
+	}
 
 	/**
 	 * A layer in the neural network.
@@ -37,7 +42,8 @@ public class Layer {
 	 * @return
 	 */
 	public Vector getLayerOutput(Vector input) {
-		return activation.sigma(weight.multiply(input).add(bias));
+		Vector output = activation.sigma(weight.multiply(input).add(bias));
+		return output;
 	}
 
 	/**
@@ -73,7 +79,7 @@ public class Layer {
 	/**
 	 * @return the activation
 	 */
-	public Activation getActivation() {
+	public Activation getActivationFunction() {
 		return activation;
 	}
 

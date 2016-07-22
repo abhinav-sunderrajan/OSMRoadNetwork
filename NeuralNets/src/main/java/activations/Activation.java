@@ -2,6 +2,12 @@ package activations;
 
 import org.la4j.Vector;
 
+/**
+ * Activation for a neuron.
+ * 
+ * @author abhinav.sunderrajan
+ * 
+ */
 public interface Activation {
 
 	/**
@@ -19,5 +25,14 @@ public interface Activation {
 	 * @return
 	 */
 	public Vector sigmaPrime(Vector z);
+
+	/**
+	 * Using it for gradient based reinforcement learning refer {@link http
+	 * ://incompleteideas.net/sutton/williams-92.pdf}
+	 * 
+	 * @param z
+	 * @return
+	 */
+	public Vector sigmaPrimeBySigma(Vector z);
 
 }

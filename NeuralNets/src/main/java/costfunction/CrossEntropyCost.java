@@ -2,6 +2,8 @@ package costfunction;
 
 import org.la4j.Vector;
 
+import activations.Activation;
+
 public class CrossEntropyCost implements CostFunction {
 
 	@Override
@@ -21,7 +23,7 @@ public class CrossEntropyCost implements CostFunction {
 	}
 
 	@Override
-	public Vector delta(Vector outputActivations, Vector output, Vector z) {
+	public Vector delta(Vector outputActivations, Vector output, Vector z, Activation activation) {
 		Vector delta = outputActivations.subtract(output);
 		return delta;
 	}

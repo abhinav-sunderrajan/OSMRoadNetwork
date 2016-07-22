@@ -2,7 +2,7 @@ package costfunction;
 
 import org.la4j.Vector;
 
-import utils.CommonUtils;
+import activations.Activation;
 
 public class QuadraticCost implements CostFunction {
 
@@ -20,8 +20,8 @@ public class QuadraticCost implements CostFunction {
 	}
 
 	@Override
-	public Vector delta(Vector outputActivations, Vector output, Vector z) {
+	public Vector delta(Vector outputActivations, Vector output, Vector z, Activation activationFunction) {
 		Vector derivative = outputActivations.subtract(output);
-		return derivative.hadamardProduct(CommonUtils.sigmoidPrime(z));
+		return derivative.hadamardProduct(activationFunction.sigmaPrime(z));
 	}
 }

@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 
 import org.la4j.Vector;
 
+import activations.Activation;
+
 public interface CostFunction {
 
 	public static final DecimalFormat df = new DecimalFormat("#.####");
@@ -25,8 +27,10 @@ public interface CostFunction {
 	 * @param outputActivations
 	 * @param output
 	 * @param z
+	 * @param activation
 	 * @return
 	 */
-	public abstract Vector delta(Vector outputActivations, Vector output, Vector z);
+	public abstract Vector delta(Vector outputActivations, Vector output, Vector z,
+			Activation activation);
 
 }

@@ -91,4 +91,32 @@ public class TrainingData {
 		return batch;
 
 	}
+
+	/**
+	 * Divide the original training data into training and validation sets.
+	 * 
+	 * @param percentage
+	 *            of the original data that goes into the training set.
+	 * @return the training and validation set array.
+	 */
+	public TrainingData[] trainingAndValidationSet(double percentage) {
+		percentage = percentage >= 1.0 ? 0.9 : percentage;
+		TrainingData training = new TrainingData();
+		TrainingData validation = new TrainingData();
+
+		for (int i = 0; i < inputs.size(); i++) {
+			if (random.nextDouble() < percentage) {
+				training.getInputs().add(this.inputs.get(i));
+				training.getOutputs().add(this.outputs.get(i));
+			} else {
+				validation.getInputs().add(this.inputs.get(i));
+				validation.getOutputs().add(this.outputs.get(i));
+			}
+
+		}
+
+		TrainingData[] trainAndValidate = { training, validation };
+		return trainAndValidate;
+
+	}
 }
