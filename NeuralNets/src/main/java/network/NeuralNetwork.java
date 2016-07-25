@@ -12,6 +12,7 @@ import org.la4j.vector.DenseVector;
 import utils.CommonUtils;
 import utils.TrainingData;
 import costfunction.CostFunction;
+import costfunction.QuadraticCost;
 
 /**
  * A Neural network object.
@@ -46,9 +47,9 @@ public class NeuralNetwork {
 	 *            Does not include the inputs
 	 * @return
 	 */
-	public static NeuralNetwork getNNInstance(long seed, int[] layers, CostFunction costfunction) {
+	public static NeuralNetwork getNNInstance(long seed, int[] layers) {
 		if (network == null) {
-			network = new NeuralNetwork(seed, layers, costfunction);
+			network = new NeuralNetwork(seed, layers);
 		}
 		return network;
 	}
@@ -60,9 +61,9 @@ public class NeuralNetwork {
 	 * @param costfunction
 	 * @param nnInput
 	 */
-	private NeuralNetwork(long seed, int[] numNeurons, CostFunction costfunction) {
+	private NeuralNetwork(long seed, int[] numNeurons) {
 		this.random = new Random(seed);
-		this.costFunction = costfunction;
+		this.costFunction = new QuadraticCost();
 		numOfLayers = numNeurons.length;
 		nnLayers = new Layer[numOfLayers];
 		regularization = REGULARIZATION.NONE;
@@ -83,14 +84,30 @@ public class NeuralNetwork {
 			if (index > 0)
 				nCol = numNeurons[index - 1];
 			double arr[][] = new double[nRow][nCol];
+			int div = nCol > 100 ? 100 : nCol;
 			for (int i = 0; i < nRow; i++) {
 				for (int j = 0; j < nCol; j++)
-					arr[i][j] = random.nextGaussian();
+					arr[i][j] = random.nextGaussian() / Math.sqrt(nCol);
 			}
 
 			nnLayers[index].setWeight(DenseMatrix.from2DArray(arr));
 		}
 
+	}
+
+	/**
+	 * @return the costFunction
+	 */
+	public CostFunction getCostFunction() {
+		return costFunction;
+	}
+
+	/**
+	 * @param costFunction
+	 *            the costFunction to set
+	 */
+	public void setCostFunction(CostFunction costFunction) {
+		this.costFunction = costFunction;
 	}
 
 	/**
@@ -171,12 +188,10 @@ public class NeuralNetwork {
 		for (int input = 0; input < n; input++) {
 			Vector nnOutput = feedForward(trainingData.getInputs().get(input));
 			Vector desiredOutput = trainingData.getOutputs().get(input);
-			for (int i = 0; i < desiredOutput.length(); i++) {
-				cost += costFunction.getCost(desiredOutput, nnOutput);
-			}
+			cost += costFunction.getCost(desiredOutput, nnOutput);
 		}
-
 		return cost / trainingData.getInputs().size();
+
 	}
 
 	public int evaluate() {
@@ -222,53 +237,47 @@ public class NeuralNetwork {
 	 */
 	public void stochasticGradientDescent(int batchSize, int epochs, double eta) {
 		int n = trainingData.getInputs().size();
-		System.out.println("Epoch\tError\tAccuracy");
-		for (int epoch = 0; epoch < epochs; epoch++) {
+		double error = getError();
+		int epoch = 0;
+		do {
 			TrainingData batch = trainingData.miniBatch(batchSize);
 			for (int i = 0; i < batchSize; i++) {
 				WeighBiasUpdate update = backPropagation(batch.getInputs().get(i), batch
 						.getOutputs().get(i));
 				for (int layer = 0; layer < update.biasUpdate.size(); layer++) {
+					Matrix weight = nnLayers[layer].getWeight();
+					Vector bias = nnLayers[layer].getBias();
 					switch (regularization) {
 					case L1:
-						nnLayers[layer]
-								.setWeight(nnLayers[layer]
-										.getWeight()
-										.subtract(
-												CommonUtils.signum(nnLayers[layer].getWeight())
-														.multiply(eta * lambda / n))
-										.subtract(
-												update.weightUpdate.get(layer).multiply(
-														eta / batchSize)));
+						weight = weight.subtract(
+								CommonUtils.signum(nnLayers[layer].getWeight()).multiply(
+										eta * lambda / n)).subtract(
+								update.weightUpdate.get(layer).multiply(eta / batchSize));
 						break;
 					case L2:
-						nnLayers[layer]
-								.setWeight(nnLayers[layer]
-										.getWeight()
-										.multiply((1 - eta * (lambda / n)))
-										.subtract(
-												update.weightUpdate.get(layer).multiply(
-														eta / batchSize)));
+						double scale = 1.0 - eta * (lambda / n);
+						weight = weight.multiply(scale);
+						weight = weight.subtract(update.weightUpdate.get(layer).multiply(
+								eta / batchSize));
 						break;
 					default:
-						nnLayers[layer].setWeight(nnLayers[layer].getWeight().subtract(
-								update.weightUpdate.get(layer).multiply(eta / batchSize)));
+						weight = weight.subtract(update.weightUpdate.get(layer).multiply(
+								eta / batchSize));
 					}
 					if (layer > 0)
-						nnLayers[layer].setBias(nnLayers[layer].getBias().subtract(
-								update.biasUpdate.get(layer).multiply(eta / batchSize)));
+						bias = bias
+								.subtract(update.biasUpdate.get(layer).multiply(eta / batchSize));
+					nnLayers[layer].setBias(bias);
+					nnLayers[layer].setWeight(weight);
 				}
 
 			}
+			error = getError();
+			System.out.println((epoch + 1) + "\t" + error);
+			epoch++;
+		} while (error > 0.01 && epoch < 5000);
 
-			double error = getError();
-			if (epoch == epochs - 1)
-				System.out.println("crap");
-			System.out.println((epoch + 1) + "\t" + error + "\t" + evaluate() + "/"
-					+ validationData.getInputs().size());
-		}
-
-		System.out.println("Accuracy:" + evaluate());
+		// System.out.println("Accuracy:" + evaluate());
 
 	}
 
